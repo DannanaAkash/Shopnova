@@ -265,7 +265,7 @@ export const searchProducts = (query: string) => {
     
     if (tokens.length === 0) return true;
     
-    return tokens.some(token => 
+    return tokens.every(token => 
       p.name.toLowerCase().includes(token) || 
       p.description.toLowerCase().includes(token) ||
       p.category.toLowerCase().includes(token)

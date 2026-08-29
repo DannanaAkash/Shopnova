@@ -1,4 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+const fs = require('fs');
+
+const fileContent = `import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles, X, Send, Bot, User as UserIcon, Mic, Music, MessageSquare } from 'lucide-react';
 
 interface Message {
@@ -101,14 +103,14 @@ export default function NovaAssistant() {
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-6 z-40 w-16 h-16 bg-gradient-to-br from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 rounded-full shadow-lg shadow-purple-500/30 text-white flex items-center justify-center hover:scale-110 hover:shadow-purple-500/50 transition-all duration-300 ${isOpen ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}
+        className={\`fixed bottom-6 right-6 z-40 w-16 h-16 bg-gradient-to-br from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500 rounded-full shadow-lg shadow-purple-500/30 text-white flex items-center justify-center hover:scale-110 hover:shadow-purple-500/50 transition-all duration-300 \${isOpen ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}\`}
       >
         <Sparkles className="w-8 h-8" />
       </button>
 
       {/* Chat Window */}
       <div 
-        className={`fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-50 w-[calc(100vw-3rem)] sm:w-[400px] bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col transition-all duration-500 origin-bottom-right ${isOpen ? 'scale-100 opacity-100 h-[600px] max-h-[80vh]' : 'scale-0 opacity-0 h-0'}`}
+        className={\`fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-50 w-[calc(100vw-3rem)] sm:w-[400px] bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden flex flex-col transition-all duration-500 origin-bottom-right \${isOpen ? 'scale-100 opacity-100 h-[600px] max-h-[80vh]' : 'scale-0 opacity-0 h-0'}\`}
       >
         {/* Header */}
         <div className="bg-gradient-to-r from-red-500 via-yellow-500 to-purple-600 p-4 flex flex-col shrink-0">
@@ -134,19 +136,19 @@ export default function NovaAssistant() {
           <div className="flex bg-white/10 p-1 rounded-xl">
             <button 
               onClick={() => setActiveTab('chat')}
-              className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'chat' ? 'bg-white text-purple-600 shadow' : 'text-white/80 hover:text-white'}`}
+              className={\`flex-1 flex items-center justify-center gap-2 py-1.5 rounded-lg text-sm font-medium transition-all \${activeTab === 'chat' ? 'bg-white text-purple-600 shadow' : 'text-white/80 hover:text-white'}\`}
             >
               <MessageSquare className="w-4 h-4" /> Chat
             </button>
             <button 
               onClick={() => setActiveTab('voice')}
-              className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'voice' ? 'bg-white text-purple-600 shadow' : 'text-white/80 hover:text-white'}`}
+              className={\`flex-1 flex items-center justify-center gap-2 py-1.5 rounded-lg text-sm font-medium transition-all \${activeTab === 'voice' ? 'bg-white text-purple-600 shadow' : 'text-white/80 hover:text-white'}\`}
             >
               <Mic className="w-4 h-4" /> Voice
             </button>
             <button 
               onClick={() => setActiveTab('music')}
-              className={`flex-1 flex items-center justify-center gap-2 py-1.5 rounded-lg text-sm font-medium transition-all ${activeTab === 'music' ? 'bg-white text-purple-600 shadow' : 'text-white/80 hover:text-white'}`}
+              className={\`flex-1 flex items-center justify-center gap-2 py-1.5 rounded-lg text-sm font-medium transition-all \${activeTab === 'music' ? 'bg-white text-purple-600 shadow' : 'text-white/80 hover:text-white'}\`}
             >
               <Music className="w-4 h-4" /> Music
             </button>
@@ -156,18 +158,18 @@ export default function NovaAssistant() {
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50">
           {currentMessages.map(msg => (
-            <div key={msg.id} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-              <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center mt-1 ${
+            <div key={msg.id} className={\`flex gap-3 \${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}\`}>
+              <div className={\`w-8 h-8 shrink-0 rounded-full flex items-center justify-center mt-1 \${
                 msg.role === 'assistant' ? 'bg-indigo-100 text-indigo-600' : 'bg-slate-200 text-slate-600'
-              }`}>
+              }\`}>
                 {msg.role === 'assistant' ? <Bot className="w-5 h-5" /> : <UserIcon className="w-5 h-5" />}
               </div>
-              <div className={`p-3 rounded-2xl max-w-[75%] text-sm ${
+              <div className={\`p-3 rounded-2xl max-w-[75%] text-sm \${
                 msg.role === 'user' 
                   ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-tr-none' 
                   : 'bg-white border border-slate-100 text-slate-700 rounded-tl-none shadow-sm prose prose-sm prose-indigo'
-              }`}>
-                <div dangerouslySetInnerHTML={{ __html: msg.content.replace(/\n/g, '<br />') }} />
+              }\`}>
+                <div dangerouslySetInnerHTML={{ __html: msg.content.replace(/\\n/g, '<br />') }} />
               </div>
             </div>
           ))}
@@ -201,7 +203,7 @@ export default function NovaAssistant() {
                 <button
                   type="button"
                   onClick={() => setIsRecording(!isRecording)}
-                  className={`absolute right-2 top-1.5 bottom-1.5 w-10 flex items-center justify-center rounded-xl transition-colors ${isRecording ? 'bg-red-100 text-red-500 animate-pulse' : 'text-slate-400 hover:bg-slate-200'}`}
+                  className={\`absolute right-2 top-1.5 bottom-1.5 w-10 flex items-center justify-center rounded-xl transition-colors \${isRecording ? 'bg-red-100 text-red-500 animate-pulse' : 'text-slate-400 hover:bg-slate-200'}\`}
                 >
                   <Mic className="w-4 h-4" />
                 </button>
@@ -220,3 +222,5 @@ export default function NovaAssistant() {
     </>
   );
 }
+`;
+fs.writeFileSync('src/components/NovaAssistant.tsx', fileContent);

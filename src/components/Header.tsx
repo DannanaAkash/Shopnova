@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, User, Heart, Sparkles, Menu } from 'lucide-react';
+import { Search, ShoppingCart, User, Heart, Sparkles, Menu, Camera, Loader2 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -8,6 +8,8 @@ export default function Header() {
   const { cart } = useCart();
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
   const handleSearch = (e: React.FormEvent) => {
@@ -15,6 +17,34 @@ export default function Header() {
     if (searchQuery.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
     }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      try {
+        const base64Data = (reader.result as string).split(',')[1];
+        const res = await fetch('/api/ai/visual-search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ image: base64Data, mimeType: file.type })
+        });
+        const data = await res.json();
+        if (data.query) {
+          setSearchQuery(data.query);
+          navigate(`/search?q=${encodeURIComponent(data.query)}`);
+        }
+      } catch (err) {
+        console.error("Visual search error", err);
+      } finally {
+        setIsUploading(false);
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
@@ -25,7 +55,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-16 md:h-20 gap-4">
           
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
+          <Link to="/" className="flex items-center gap-2 group shrink-0">
             <div className="p-2 bg-gradient-to-br from-red-500 via-yellow-500 to-purple-600 rounded-xl text-white shadow-lg group-hover:scale-105 transition-transform">
               <Sparkles className="w-6 h-6" />
             </div>
@@ -35,9 +65,9 @@ export default function Header() {
           </Link>
 
           {/* Search Bar - Hidden on mobile, shown on md+ */}
-          <div className="hidden md:flex flex-1 max-w-2xl px-8">
+          <div className="hidden md:flex flex-1 max-w-2xl px-4 lg:px-8">
             <form onSubmit={handleSearch} className="w-full relative">
-              <div className="relative group">
+              <div className="relative group flex items-center">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Search className="h-5 w-5 text-indigo-400 group-focus-within:text-indigo-600 transition-colors" />
                 </div>
@@ -45,12 +75,32 @@ export default function Header() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full pl-10 pr-4 py-3 border border-indigo-100 rounded-2xl leading-5 bg-indigo-50/30 placeholder-indigo-300 focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all sm:text-sm"
+                  className="block w-full pl-10 pr-24 py-3 border border-indigo-100 rounded-2xl leading-5 bg-indigo-50/30 placeholder-indigo-300 focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all sm:text-sm"
                   placeholder="Ask Nova AI to find something... (e.g. Best phone under ₹30,000)"
                 />
-                <button type="submit" className="absolute inset-y-1 right-1 bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 text-white px-4 rounded-xl text-sm font-medium hover:shadow-md transition-all">
-                  Search
-                </button>
+                
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  onChange={handleImageUpload} 
+                  accept="image/*" 
+                  className="hidden" 
+                />
+                
+                <div className="absolute inset-y-1 right-1 flex items-center gap-1">
+                  <button 
+                    type="button" 
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                    title="Search by image"
+                    className="p-2 text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                  >
+                    {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
+                  </button>
+                  <button type="submit" className="bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 text-white px-3 py-1.5 rounded-xl text-sm font-medium hover:shadow-md transition-all">
+                    Search
+                  </button>
+                </div>
               </div>
             </form>
           </div>
@@ -71,14 +121,14 @@ export default function Header() {
             </Link>
             
             {user ? (
-              <Link to="/profile" className="hidden sm:flex items-center gap-2 p-2 text-slate-700 hover:text-indigo-600 transition-colors rounded-full hover:bg-indigo-50 font-bold">
+              <Link to="/profile" className="flex items-center gap-2 p-2 text-slate-700 hover:text-indigo-600 transition-colors rounded-full hover:bg-indigo-50 font-bold">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-r from-red-500 via-yellow-500 to-purple-500 flex items-center justify-center text-white text-sm">
                   {user.name.charAt(0).toUpperCase()}
                 </div>
-                <span className="text-sm">{user.name}</span>
+                <span className="text-sm hidden sm:block">{user.name}</span>
               </Link>
             ) : (
-              <Link to="/login" className="hidden sm:flex items-center gap-2 p-2 text-slate-400 hover:text-indigo-600 transition-colors rounded-full hover:bg-indigo-50">
+              <Link to="/login" className="flex items-center gap-2 p-2 text-slate-400 hover:text-indigo-600 transition-colors rounded-full hover:bg-indigo-50">
                 <User className="w-6 h-6" />
               </Link>
             )}

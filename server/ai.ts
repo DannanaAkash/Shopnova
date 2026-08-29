@@ -87,3 +87,24 @@ export async function summarizeReviews(productName: string) {
     return "Reviews are generally positive, with most users satisfied with the purchase.";
   }
 }
+
+export async function visualSearch(base64Data: string, mimeType: string) {
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-3.6-flash",
+      contents: [
+        {
+          inlineData: {
+            data: base64Data,
+            mimeType: mimeType
+          }
+        },
+        "What product is in this image? Provide a 1-3 word search query to find similar items in our store (e.g. 'Laptop', 'Running Shoes', 'Smart Watch'). Just return the keywords, nothing else."
+      ]
+    });
+    return response.text;
+  } catch (error) {
+    console.error("Visual Search Error:", error);
+    return "Product";
+  }
+}
