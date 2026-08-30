@@ -32,7 +32,7 @@ export default function ProductCard({ product }: { product: Product }) {
         {product.smartScore && (
           <div className="flex items-center gap-1 bg-white/90 backdrop-blur-sm text-indigo-700 text-xs font-bold px-3 py-1.5 rounded-full shadow-md border border-indigo-100 mb-2">
             <Sparkles className="w-3 h-3 text-indigo-500" />
-            Nova Score: {product.smartScore}
+            AI Score: {product.smartScore}
           </div>
         )}
         <button 

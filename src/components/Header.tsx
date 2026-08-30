@@ -1,6 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, User, Heart, Sparkles, Menu, Camera, Loader2 } from 'lucide-react';
+import { Search, ShoppingCart, User, Heart, Sparkles, Menu, Camera, Loader2, Music, Volume2, VolumeX } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -9,8 +9,34 @@ export default function Header() {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [isPlayingMusic, setIsPlayingMusic] = useState(false);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Ambient lo-fi background music
+    audioRef.current = new Audio('https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3');
+    audioRef.current.loop = true;
+    audioRef.current.volume = 0.2;
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+    };
+  }, []);
+
+  const toggleMusic = () => {
+    if (!audioRef.current) return;
+    if (isPlayingMusic) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play().catch(e => console.error("Audio play error", e));
+    }
+    setIsPlayingMusic(!isPlayingMusic);
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,7 +102,7 @@ export default function Header() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="block w-full pl-10 pr-24 py-3 border border-indigo-100 rounded-2xl leading-5 bg-indigo-50/30 placeholder-indigo-300 focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all sm:text-sm"
-                  placeholder="Ask Nova AI to find something... (e.g. Best phone under ₹30,000)"
+                  placeholder="Ask AI Assistant to find something... (e.g. Best phone under ₹30,000)"
                 />
                 
                 <input 
@@ -107,6 +133,19 @@ export default function Header() {
 
           {/* Nav Icons */}
           <div className="flex items-center space-x-2 sm:space-x-4">
+            <button 
+              onClick={toggleMusic} 
+              title={isPlayingMusic ? "Mute Background Music" : "Play Background Music"}
+              className="hidden sm:flex p-2 text-slate-400 hover:text-indigo-600 transition-colors rounded-full hover:bg-indigo-50 items-center justify-center relative group"
+            >
+              {isPlayingMusic ? <Volume2 className="w-6 h-6 text-indigo-500 animate-pulse" /> : <VolumeX className="w-6 h-6" />}
+              {isPlayingMusic && (
+                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
+                </span>
+              )}
+            </button>
             <Link to="/wishlist" className="p-2 text-slate-400 hover:text-rose-500 transition-colors rounded-full hover:bg-rose-50">
               <Heart className="w-6 h-6" />
             </Link>

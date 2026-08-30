@@ -12,7 +12,7 @@ export default function NovaAssistant() {
   const [activeTab, setActiveTab] = useState<'chat' | 'voice' | 'music'>('chat');
   
   const [messages, setMessages] = useState<Message[]>([
-    { id: '1', role: 'assistant', content: 'Hi! I am Nova AI. Ask me to find products, compare items, or find something within your budget!' }
+    { id: '1', role: 'assistant', content: 'Hi! I am AI Assistant. Ask me to find products, compare items, or find something within your budget!' }
   ]);
   const [voiceMessages, setVoiceMessages] = useState<Message[]>([
     { id: '1', role: 'assistant', content: 'Voice Mode Active! Say something or type below to talk with me in real-time.' }
@@ -118,7 +118,7 @@ export default function NovaAssistant() {
                 <Bot className="w-6 h-6" />
               </div>
               <div>
-                <div className="font-bold text-lg leading-tight">Nova AI</div>
+                <div className="font-bold text-lg leading-tight">AI Assistant</div>
                 <div className="text-indigo-100 text-xs">Smart Shopping Assistant</div>
               </div>
             </div>
@@ -194,7 +194,7 @@ export default function NovaAssistant() {
                 type="text"
                 value={input}
                 onChange={e => setInput(e.target.value)}
-                placeholder={activeTab === 'music' ? "Ask for a song..." : "Ask Nova anything..."}
+                placeholder={activeTab === 'music' ? "Ask for a song..." : "Ask AI anything..."}
                 className="w-full pl-4 pr-12 py-3 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm"
               />
               {activeTab === 'voice' && (

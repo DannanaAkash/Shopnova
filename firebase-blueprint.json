@@ -1,0 +1,38 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile data",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "maxLength": 100 },
+        "photoURL": { "type": "string", "maxLength": 2000000 },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["name", "email", "createdAt"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "User order data",
+      "type": "object",
+      "properties": {
+        "total": { "type": "number" },
+        "status": { "type": "string", "maxLength": 50 },
+        "date": { "type": "string", "maxLength": 50 },
+        "items": { "type": "array" }
+      },
+      "required": ["total", "status", "date", "items"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profile documents"
+    },
+    "/users/{userId}/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Orders for a user"
+    }
+  }
+}

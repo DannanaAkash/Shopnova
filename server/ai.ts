@@ -24,7 +24,7 @@ const getProductsContext = () => {
 export async function askNova(query: string) {
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3.6-flash",
+      model: "gemini-3.1-flash-lite",
       contents: query,
       config: {
         systemInstruction: `You are Nova AI, the smart shopping assistant for "Shopping Zone". 
@@ -45,7 +45,7 @@ export async function askNova(query: string) {
 export async function explainSimply(technicalSpecs: string) {
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3.6-flash",
+      model: "gemini-3.1-flash-lite",
       contents: `Explain this technical specification simply, like I'm new to this: "${technicalSpecs}"`,
       config: {
         systemInstruction: "You are a helpful shopping assistant. Explain technical terms in 1-2 short, simple sentences so anyone can understand."
@@ -61,7 +61,7 @@ export async function compareProductsWithAI(productNames: string[]) {
   try {
     const selectedProducts = products.filter(p => productNames.includes(p.name));
     const response = await ai.models.generateContent({
-      model: "gemini-3.6-flash",
+      model: "gemini-3.1-flash-lite",
       contents: `Compare these products and give a simple verdict on which is better for whom: ${JSON.stringify(selectedProducts)}`,
       config: {
         systemInstruction: "You are Nova AI. Compare the given products. Keep it brief. Provide an 'AI Verdict' at the end."
@@ -76,7 +76,7 @@ export async function compareProductsWithAI(productNames: string[]) {
 export async function summarizeReviews(productName: string) {
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3.6-flash",
+      model: "gemini-3.1-flash-lite",
       contents: `Generate a realistic review summary for a product named "${productName}". Give a bulleted list of 2-3 positives, 1-2 negatives, and a 1 sentence overall customer opinion.`,
       config: {
         systemInstruction: "You are a shopping assistant. Summarize customer sentiment realistically based on the product name."
@@ -91,7 +91,7 @@ export async function summarizeReviews(productName: string) {
 export async function visualSearch(base64Data: string, mimeType: string) {
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3.6-flash",
+      model: "gemini-3.1-flash-lite",
       contents: [
         {
           inlineData: {

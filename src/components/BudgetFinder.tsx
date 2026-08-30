@@ -30,7 +30,7 @@ export default function BudgetFinder() {
           <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-6 leading-tight">
             Tell us your budget.<br/>
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-yellow-400 to-green-400">
-              Nova AI will do the rest.
+              AI Assistant will do the rest.
             </span>
           </h2>
           <p className="text-indigo-100/80 text-lg max-w-xl mx-auto lg:mx-0">

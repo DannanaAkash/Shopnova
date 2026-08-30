@@ -116,7 +116,7 @@ export default function ProductDetails() {
             {product.smartScore && (
               <div className="flex items-center gap-1 bg-gradient-to-r from-red-500 via-yellow-500 to-purple-500 px-3 py-1 rounded-full text-white shadow-sm">
                 <Sparkles className="w-4 h-4 text-white" />
-                <span className="font-bold text-sm">Nova Score: {product.smartScore}/100</span>
+                <span className="font-bold text-sm">AI Score: {product.smartScore}/100</span>
               </div>
             )}
           </div>

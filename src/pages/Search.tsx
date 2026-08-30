@@ -32,7 +32,7 @@ export default function Search() {
         setLoading(false);
       });
 
-    // If there is a natural language query, ask Nova AI
+    // If there is a natural language query, ask AI Assistant
     if (query) {
       fetch('/api/ai/chat', {
         method: 'POST',
@@ -71,7 +71,7 @@ export default function Search() {
               <Sparkles className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Nova AI Insights</h3>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">AI Assistant Insights</h3>
               {aiResponse ? (
                 <div className="prose prose-indigo max-w-none text-slate-700">
                   {aiResponse}
@@ -115,7 +115,7 @@ export default function Search() {
             <SearchIcon className="w-10 h-10" />
           </div>
           <h2 className="text-2xl font-bold text-slate-900 mb-2">No products found</h2>
-          <p className="text-slate-500">Try adjusting your search terms or ask Nova AI for help.</p>
+          <p className="text-slate-500">Try adjusting your search terms or ask AI Assistant for help.</p>
         </div>
       )}
     </div>

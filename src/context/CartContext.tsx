@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Product, CartItem } from '../types';
+import { playSound } from '../lib/sounds';
 
 interface CartContextType {
   cart: CartItem[];
@@ -16,6 +17,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
 
   const addToCart = (product: Product) => {
+    playSound('cart');
     setCart(prev => {
       const existing = prev.find(item => item.id === product.id);
       if (existing) {

@@ -1,11 +1,14 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { formatCurrency } from '../lib/utils';
-import { Trash2, Plus, Minus, ArrowRight, ShoppingBag } from 'lucide-react';
+import { playSound } from '../lib/sounds';
+import { Trash2, Plus, Minus, ArrowRight, ShoppingBag, LogIn } from 'lucide-react';
 
 export default function Cart() {
   const { cart, updateQuantity, removeFromCart, getCartTotal } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const total = getCartTotal();
@@ -45,18 +48,17 @@ export default function Cart() {
                 <div className="text-xl font-extrabold text-slate-900 mb-4">
                   {formatCurrency(item.price * (1 - item.discount / 100))}
                 </div>
-                
-                <div className="flex items-center justify-between w-full mt-auto">
+                                <div className="flex items-center justify-between w-full mt-auto">
                   <div className="flex items-center bg-slate-50 rounded-full border border-slate-200">
                     <button 
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      onClick={() => { playSound('click'); updateQuantity(item.id, item.quantity - 1); }}
                       className="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-indigo-600 transition-colors"
                     >
                       <Minus className="w-4 h-4" />
                     </button>
                     <span className="w-10 text-center font-bold text-slate-900">{item.quantity}</span>
                     <button 
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      onClick={() => { playSound('click'); updateQuantity(item.id, item.quantity + 1); }}
                       className="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-indigo-600 transition-colors"
                     >
                       <Plus className="w-4 h-4" />
@@ -64,7 +66,7 @@ export default function Cart() {
                   </div>
                   
                   <button 
-                    onClick={() => removeFromCart(item.id)}
+                    onClick={() => { playSound('click'); removeFromCart(item.id); }}
                     className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-colors"
                   >
                     <Trash2 className="w-5 h-5" />
@@ -101,12 +103,24 @@ export default function Cart() {
               </div>
             </div>
             
-            <button 
-              onClick={() => navigate('/checkout')}
-              className="w-full bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 to-blue-500 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 hover:shadow-lg transition-all"
-            >
-              Proceed to Checkout <ArrowRight className="w-5 h-5" />
-            </button>
+            {user ? (
+              <button 
+                onClick={() => { playSound('click'); navigate('/checkout'); }}
+                className="w-full bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 to-blue-500 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 hover:shadow-lg transition-all"
+              >
+                Proceed to Checkout <ArrowRight className="w-5 h-5" />
+              </button>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-sm text-rose-500 font-medium text-center">You must be logged in to checkout.</p>
+                <button 
+                  onClick={() => { playSound('click'); navigate('/login'); }}
+                  className="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 hover:shadow-lg transition-all"
+                >
+                  <LogIn className="w-5 h-5" /> Sign in to Checkout
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

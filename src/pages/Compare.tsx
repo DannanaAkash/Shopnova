@@ -79,7 +79,7 @@ export default function Compare() {
               <Sparkles className="w-7 h-7 text-indigo-200" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white mb-3">Nova AI Verdict</h2>
+              <h2 className="text-xl font-bold text-white mb-3">AI Assistant Verdict</h2>
               {loading ? (
                 <div className="flex items-center gap-2 text-indigo-200 font-medium">
                   <div className="w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></div>

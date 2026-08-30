@@ -57,7 +57,7 @@ export default function Home() {
               className="px-8 py-4 bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 to-blue-500 text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
             >
               <Sparkles className="w-5 h-5" />
-              Ask Nova AI
+              Ask AI Assistant
             </button>
             <a href="#trending" className="px-8 py-4 bg-white text-indigo-600 rounded-2xl font-semibold shadow-md hover:shadow-lg hover:-translate-y-0.5 border border-indigo-100 transition-all flex items-center justify-center">
               Explore Products
@@ -89,7 +89,7 @@ export default function Home() {
                 <ShieldCheck className="w-7 h-7" />
               </div>
               <h3 className="text-xl font-bold text-slate-800 mb-2">Review Summary</h3>
-              <p className="text-slate-600">Don't read hundreds of reviews. Nova AI summarizes the pros and cons instantly.</p>
+              <p className="text-slate-600">Don't read hundreds of reviews. AI Assistant summarizes the pros and cons instantly.</p>
             </div>
           </div>
         </div>
