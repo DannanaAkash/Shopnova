@@ -22,21 +22,23 @@ export default function Checkout() {
   const total = cart.reduce((sum, item) => sum + (item.price * (1 - item.discount / 100)) * item.quantity, 0);
 
   const [deliveryDate, setDeliveryDate] = useState<string>("");
+  const [orderId, setOrderId] = useState<string>("");
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => {
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setStep(3);
-      playSound('success');
+    
+    try {
       const estimatedDelivery = new Date();
       estimatedDelivery.setDate(estimatedDelivery.getDate() + 3);
       const deliveryIso = estimatedDelivery.toISOString();
       setDeliveryDate(estimatedDelivery.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }));
       
+      const newOrderId = `ORD-${Math.floor(Math.random() * 1000000)}`;
+      setOrderId(newOrderId);
+      
       if (user) {
-        addOrder({
-          id: `ORD-${Math.floor(Math.random() * 1000000)}`,
+        await addOrder({
+          id: newOrderId,
           date: new Date().toISOString(),
           deliveryDate: deliveryIso,
           total,
@@ -44,8 +46,16 @@ export default function Checkout() {
           status: 'Processing'
         });
       }
+      
       clearCart();
-    }, 1500);
+      setLoading(false);
+      setStep(3);
+      playSound('payment');
+    } catch (err) {
+      console.error("Failed to place order", err);
+      setLoading(false);
+      alert("Failed to place order. Please try again.");
+    }
   };
 
   if (cart.length === 0 && step !== 3) {
@@ -76,74 +86,99 @@ export default function Checkout() {
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-slate-100">
-        {step === 1 && (
-          <div className="space-y-6 animate-in fade-in">
-            <h2 className="text-xl font-bold flex items-center gap-2"><MapPin className="text-blue-500" /> Delivery Address</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">Full Name</label>
-                <input type="text" defaultValue={user?.name} className="w-full p-3 border border-slate-200 rounded-xl bg-slate-50" placeholder="John Doe" />
+      <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex-1 bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-10 shadow-sm border border-slate-100 dark:border-slate-800">
+          {step === 1 && (
+            <div className="space-y-6 animate-in fade-in">
+              <h2 className="text-xl font-bold flex items-center gap-2 dark:text-white"><MapPin className="text-blue-500" /> Delivery Address</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Full Name</label>
+                  <input type="text" defaultValue={user?.name} className="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800 dark:text-white" placeholder="John Doe" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Phone Number</label>
+                  <input type="text" defaultValue={user?.phone || ''} className="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800 dark:text-white" placeholder="+91 9876543210" />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Address</label>
+                  <textarea defaultValue={user?.address || ''} className="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800 dark:text-white" placeholder="123 Main St, Apt 4B" rows={3}></textarea>
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-bold text-slate-700 mb-2">Phone Number</label>
-                <input type="text" defaultValue={user?.phone || ''} className="w-full p-3 border border-slate-200 rounded-xl bg-slate-50" placeholder="+91 9876543210" />
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-bold text-slate-700 mb-2">Address</label>
-                <textarea defaultValue={user?.address || ''} className="w-full p-3 border border-slate-200 rounded-xl bg-slate-50" placeholder="123 Main St, Apt 4B" rows={3}></textarea>
-              </div>
+              <button 
+                onClick={() => { playSound('click'); setStep(2); }}
+                className="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-blue-700"
+              >
+                Continue to Payment <ArrowRight className="w-5 h-5" />
+              </button>
             </div>
-            <button 
-              onClick={() => { playSound('click'); setStep(2); }}
-              className="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-blue-700"
-            >
-              Continue to Payment <ArrowRight className="w-5 h-5" />
-            </button>
-          </div>
-        )}
+          )}
 
         {step === 2 && (
           <div className="space-y-6 animate-in fade-in">
-            <h2 className="text-xl font-bold flex items-center gap-2"><CreditCard className="text-blue-500" /> Payment Method</h2>
-                        <div className="space-y-4">
-              <label className="flex items-center gap-4 p-4 border border-blue-200 bg-blue-50/50 rounded-2xl cursor-pointer">
-                <input type="radio" name="payment" defaultChecked className="w-5 h-5 text-blue-600" onChange={() => playSound('click')} />
-                <div>
-                  <div className="font-bold">Credit / Debit Card</div>
-                  <div className="text-sm text-slate-500">Pay securely with your card</div>
+            <h2 className="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-white"><CreditCard className="text-purple-500" /> Payment Details</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <label className="flex flex-col items-center gap-3 p-5 border-2 border-purple-500 bg-purple-50 dark:bg-purple-900/20 rounded-2xl cursor-pointer relative overflow-hidden transition-all shadow-md shadow-purple-100 dark:shadow-none">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-indigo-500/10"></div>
+                <input type="radio" name="payment" defaultChecked className="w-5 h-5 text-purple-600 absolute top-4 right-4 z-10" onChange={() => playSound('click')} />
+                <CreditCard className="w-8 h-8 text-purple-600 dark:text-purple-400 relative z-10" />
+                <div className="text-center relative z-10">
+                  <div className="font-bold text-purple-900 dark:text-purple-100">Credit / Debit</div>
+                  <div className="text-xs text-purple-600 dark:text-purple-300 mt-1">Visa, Mastercard</div>
                 </div>
               </label>
-              <label className="flex items-center gap-4 p-4 border border-slate-200 rounded-2xl cursor-pointer hover:bg-slate-50">
-                <input type="radio" name="payment" className="w-5 h-5" onChange={() => playSound('click')} />
-                <div>
-                  <div className="font-bold">UPI / Wallet</div>
-                  <div className="text-sm text-slate-500">Google Pay, PhonePe, Paytm</div>
+
+              <label className="flex flex-col items-center gap-3 p-5 border-2 border-slate-200 dark:border-slate-700 rounded-2xl cursor-pointer hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all">
+                <input type="radio" name="payment" className="w-5 h-5 absolute top-4 right-4 opacity-50" onChange={() => playSound('click')} />
+                <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold">U</div>
+                <div className="text-center">
+                  <div className="font-bold text-slate-800 dark:text-white">UPI / Wallet</div>
+                  <div className="text-xs text-slate-500 mt-1">GPay, PhonePe</div>
                 </div>
               </label>
-              <label className="flex items-center gap-4 p-4 border border-slate-200 rounded-2xl cursor-pointer hover:bg-slate-50">
-                <input type="radio" name="payment" className="w-5 h-5" onChange={() => playSound('click')} />
-                <div>
-                  <div className="font-bold">Cash on Delivery</div>
-                  <div className="text-sm text-slate-500">Pay when you receive the order</div>
+
+              <label className="flex flex-col items-center gap-3 p-5 border-2 border-slate-200 dark:border-slate-700 rounded-2xl cursor-pointer hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all">
+                <input type="radio" name="payment" className="w-5 h-5 absolute top-4 right-4 opacity-50" onChange={() => playSound('click')} />
+                <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center text-green-600 dark:text-green-400 font-bold">₹</div>
+                <div className="text-center">
+                  <div className="font-bold text-slate-800 dark:text-white">Cash on Delivery</div>
+                  <div className="text-xs text-slate-500 mt-1">Pay at doorstep</div>
                 </div>
               </label>
             </div>
 
-            <div className="border-t border-slate-100 pt-6 mt-6">
+            <div className="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
+               <div>
+                  <label className="block text-sm font-bold text-slate-300 mb-2">Card Number</label>
+                  <input type="text" className="w-full p-3 border border-slate-700 rounded-xl bg-slate-800 text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder-slate-500" placeholder="0000 0000 0000 0000" />
+               </div>
+               <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-300 mb-2">Expiry Date</label>
+                    <input type="text" className="w-full p-3 border border-slate-700 rounded-xl bg-slate-800 text-white focus:ring-2 focus:ring-purple-500 outline-none transition-all placeholder-slate-500" placeholder="MM/YY" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-slate-300 mb-2">CVV</label>
+                    <input type="password" maxLength={3} className="w-full p-3 border border-slate-700 rounded-xl bg-slate-800 text-white focus:ring-2 focus:ring-purple-500 outline-none transition-all placeholder-slate-500" placeholder="•••" />
+                  </div>
+               </div>
+            </div>
+
+            <div className="border-t border-slate-200 dark:border-slate-700 pt-6 mt-6">
               <div className="flex justify-between items-center mb-6">
-                <span className="text-lg font-bold">Total to Pay</span>
-                <span className="text-2xl font-extrabold text-blue-600">{formatCurrency(total)}</span>
+                <span className="text-lg font-bold text-slate-800 dark:text-white">Total to Pay</span>
+                <span className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">{formatCurrency(total)}</span>
               </div>
               <button 
                 onClick={handlePlaceOrder}
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 hover:shadow-lg disabled:opacity-70 transition-all"
+                className="w-full bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-purple-500/30 disabled:opacity-70 transition-all"
               >
                 {loading ? (
                   <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 ) : (
-                  <>Place Order <CheckCircle2 className="w-5 h-5" /></>
+                  <>Complete Payment <CheckCircle2 className="w-5 h-5" /></>
                 )}
               </button>
             </div>
@@ -152,61 +187,58 @@ export default function Checkout() {
 
         {step === 3 && (
           <div className="text-center py-10 animate-in zoom-in">
-            <div className="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-24 h-24 bg-green-100 dark:bg-green-900/30 text-green-500 dark:text-green-400 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-green-50 dark:border-green-900/10">
               <CheckCircle2 className="w-12 h-12" />
             </div>
-            <h2 className="text-3xl font-extrabold text-slate-900 mb-4">Payment Successful!</h2>
-            <p className="text-slate-500 mb-8 max-w-md mx-auto">Your order has been confirmed and is now being processed. You will receive an email confirmation shortly.</p>
+            <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-4">Payment Successful!</h2>
+            <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-md mx-auto">Your order has been confirmed and is now being processed. You will receive an email confirmation shortly.</p>
             
-            <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-8 text-blue-800 flex items-center justify-center gap-3">
-              <MapPin className="w-6 h-6 text-blue-500" />
-              <div>
-                <div className="font-bold">Estimated Delivery</div>
-                <div className="text-lg font-extrabold">{deliveryDate}</div>
+            <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-3xl p-6 mb-8 text-indigo-800 dark:text-indigo-300 flex items-center justify-center gap-4 max-w-md mx-auto shadow-sm">
+              <MapPin className="w-8 h-8 text-indigo-500" />
+              <div className="text-left">
+                <div className="font-bold text-sm text-indigo-600 dark:text-indigo-400">Estimated Delivery</div>
+                <div className="text-xl font-extrabold">{deliveryDate}</div>
               </div>
             </div>
             
-            <div className="max-w-md mx-auto bg-slate-50 p-6 rounded-2xl border border-slate-100 mb-8 text-left">
-              <h3 className="font-bold text-slate-900 mb-4 border-b border-slate-200 pb-2">Order Tracking Process</h3>
-              <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
-                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-green-500 text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                    <CheckCircle2 className="w-5 h-5" />
-                  </div>
-                  <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-slate-100 bg-white shadow-sm">
-                    <div className="flex items-center justify-between space-x-2">
-                      <div className="font-bold text-slate-900">Order Placed</div>
-                      <div className="text-xs text-green-600 font-medium">Just now</div>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
+              <button 
+                onClick={() => navigate(`/track/${orderId}`)}
+                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold py-4 px-8 rounded-2xl hover:shadow-lg transition-all shadow-md shadow-indigo-200 dark:shadow-indigo-900/20 flex items-center justify-center gap-2"
+              >
+                <MapPin className="w-5 h-5" />
+                Track Order Route
+              </button>
+              <button 
+                onClick={() => navigate('/')}
+                className="w-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold py-4 px-8 rounded-2xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+              >
+                Continue Shopping
+              </button>
+            </div>
+          </div>
+        )}
+        </div>
+        
+        {step !== 3 && (
+          <div className="w-full lg:w-96 bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 h-fit">
+            <h2 className="text-xl font-bold mb-4 dark:text-white">Order Summary</h2>
+            <div className="space-y-4 mb-6">
+              {cart.map(item => (
+                  <div key={item.id} className="flex gap-4">
+                    <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-xl border border-slate-100 dark:border-slate-800" />
+                    <div>
+                      <h4 className="font-bold text-sm dark:text-white line-clamp-1">{item.name}</h4>
+                      <div className="text-slate-500 text-sm">Qty: {item.quantity}</div>
+                      <div className="font-bold text-blue-600">{formatCurrency((item.price * (1 - item.discount / 100)) * item.quantity)}</div>
                     </div>
                   </div>
-                </div>
-                
-                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-slate-200 text-slate-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                    <div className="w-2 h-2 bg-slate-400 rounded-full"></div>
-                  </div>
-                  <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-slate-100 bg-white/50 opacity-70">
-                    <div className="font-bold text-slate-900">Processing</div>
-                  </div>
-                </div>
-
-                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-slate-200 text-slate-500 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                    <div className="w-2 h-2 bg-slate-400 rounded-full"></div>
-                  </div>
-                  <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-slate-100 bg-white/50 opacity-70">
-                    <div className="font-bold text-slate-900">Shipped</div>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
-
-            <button 
-              onClick={() => navigate('/profile')}
-              className="bg-blue-600 text-white font-bold py-3 px-8 rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200"
-            >
-              Track Order in Profile
-            </button>
+            <div className="border-t border-slate-100 dark:border-slate-800 pt-4 flex justify-between items-center font-bold text-lg dark:text-white">
+              <span>Total</span>
+              <span>{formatCurrency(total)}</span>
+            </div>
           </div>
         )}
       </div>

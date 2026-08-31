@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Product } from '../types';
+import { playSound } from '../lib/sounds';
 
 interface WishlistContextType {
   wishlist: Product[];
@@ -13,6 +14,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   const [wishlist, setWishlist] = useState<Product[]>([]);
 
   const toggleWishlist = (product: Product) => {
+    playSound('click');
     setWishlist(prev => {
       const exists = prev.find(p => p.id === product.id);
       if (exists) {

@@ -1,42 +1,19 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, User, Heart, Sparkles, Menu, Camera, Loader2, Music, Volume2, VolumeX } from 'lucide-react';
+import { Search, ShoppingCart, User, Heart, Sparkles, Menu, Camera, Loader2, Moon, Sun } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Header() {
   const { cart } = useCart();
   const { user } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [isUploading, setIsUploading] = useState(false);
-  const [isPlayingMusic, setIsPlayingMusic] = useState(false);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // Ambient lo-fi background music
-    audioRef.current = new Audio('https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3');
-    audioRef.current.loop = true;
-    audioRef.current.volume = 0.2;
-    
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-    };
-  }, []);
-
-  const toggleMusic = () => {
-    if (!audioRef.current) return;
-    if (isPlayingMusic) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play().catch(e => console.error("Audio play error", e));
-    }
-    setIsPlayingMusic(!isPlayingMusic);
-  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,7 +53,8 @@ export default function Header() {
   const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-indigo-100/50 shadow-sm">
+    <header className="sticky top-0 z-50 w-full bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-indigo-100/50 dark:border-slate-800 shadow-sm transition-colors duration-300">
+      <div className="h-1 w-full bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500"></div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20 gap-4">
           
@@ -134,19 +112,13 @@ export default function Header() {
           {/* Nav Icons */}
           <div className="flex items-center space-x-2 sm:space-x-4">
             <button 
-              onClick={toggleMusic} 
-              title={isPlayingMusic ? "Mute Background Music" : "Play Background Music"}
-              className="hidden sm:flex p-2 text-slate-400 hover:text-indigo-600 transition-colors rounded-full hover:bg-indigo-50 items-center justify-center relative group"
+              onClick={toggleTheme} 
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              className="p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-amber-400 transition-colors rounded-full hover:bg-indigo-50 dark:hover:bg-slate-800 flex items-center justify-center"
             >
-              {isPlayingMusic ? <Volume2 className="w-6 h-6 text-indigo-500 animate-pulse" /> : <VolumeX className="w-6 h-6" />}
-              {isPlayingMusic && (
-                <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
-                </span>
-              )}
+              {theme === 'dark' ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
             </button>
-            <Link to="/wishlist" className="p-2 text-slate-400 hover:text-rose-500 transition-colors rounded-full hover:bg-rose-50">
+            <Link to="/wishlist" className="p-2 text-slate-400 hover:text-rose-500 transition-colors rounded-full hover:bg-rose-50 dark:hover:bg-rose-900/30">
               <Heart className="w-6 h-6" />
             </Link>
             

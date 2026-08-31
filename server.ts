@@ -23,6 +23,26 @@ async function startServer() {
     res.json(results.slice(0, limit));
   });
 
+  app.post("/api/proxy/routes", async (req, res) => {
+    const { apiKey, routeRequest } = req.body;
+    if (!apiKey) return res.status(400).json({ error: "API key is required" });
+    try {
+      const response = await fetch('https://routes.googleapis.com/directions/v2:computeRoutes?fields=routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Goog-Api-Key': apiKey,
+          'X-Goog-FieldMask': 'routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline'
+        },
+        body: JSON.stringify(routeRequest)
+      });
+      const data = await response.json();
+      res.json(data);
+    } catch (e) {
+      res.status(500).json({ error: "Failed to fetch routes" });
+    }
+  });
+
   app.get("/api/products/:id", (req, res) => {
     const product = getProductById(req.params.id);
     if (product) {

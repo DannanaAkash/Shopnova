@@ -1,19 +1,4 @@
-export interface Product {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  category: string;
-  image: string;
-  rating: number;
-  reviews: number;
-  features: string[];
-  specs: Record<string, string>;
-  stock: number;
-  discount: number;
-  colors: string[];
-  smartScore?: number;
-}
+import { Product } from '../src/types';
 
 export const products: Product[] = [
   {
@@ -23,70 +8,89 @@ export const products: Product[] = [
     price: 69999,
     discount: 10,
     category: "Mobiles",
-    image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=800&auto=format&fit=crop",
+    image: "/images/quantum_x_pro_smartphone.jpg",
+    images: [
+      "/images/quantum_x_pro_smartphone.jpg",
+      "https://images.unsplash.com/photo-1598327105666-5b89351cb31b?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1585060544812-6b45742d762f?q=80&w=800&auto=format&fit=crop"
+    ],
     rating: 4.8,
     reviews: 1245,
     features: ["120Hz AMOLED", "50MP AI Camera", "5000mAh Battery", "Snapdragon 8 Gen 3"],
     specs: {
+      Display: "6.7 inch AMOLED",
+      Processor: "Snapdragon 8 Gen 3",
       RAM: "12GB",
-      Storage: "256GB",
-      Camera: "50MP Main + 12MP Ultra-Wide",
-      Battery: "5000mAh"
+      Storage: "256GB"
     },
-    stock: 50,
-    colors: ["Cosmic Black", "Lunar White"],
+    stock: 45,
+    colors: ["Phantom Black", "Cosmic Silver"],
     smartScore: 94
   },
   {
     id: "p2",
-    name: "AuraBook Pro 14",
-    description: "Powerful and thin laptop for creators and developers.",
+    name: "AuraBook 14 Ultralight",
+    description: "Premium thin-and-light laptop perfect for professionals and creatives.",
     price: 85000,
     discount: 5,
     category: "Laptops",
-    image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=800&auto=format&fit=crop",
-    rating: 4.6,
+    image: "/images/aurabook_14_ultralight.jpg",
+    images: [
+      "/images/aurabook_14_ultralight.jpg",
+      "https://images.unsplash.com/photo-1531297172864-8dbcc0d44043?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=800&auto=format&fit=crop"
+    ],
+    rating: 4.7,
     reviews: 890,
-    features: ["M2 Chip equivalent", "14-inch Retina Display", "16 hours battery", "Backlit Keyboard"],
+    features: ["Ultra-thin design", "M-series chip", "18-hour battery", "Retina display"],
     specs: {
-      Processor: "Aura Silicon M2",
-      RAM: "16GB",
-      Storage: "512GB SSD",
-      Display: "14-inch 4K"
+      Screen: "14-inch Liquid Retina",
+      Processor: "M2",
+      Memory: "16GB Unified",
+      Storage: "512GB SSD"
     },
-    stock: 20,
+    stock: 22,
     colors: ["Space Gray", "Silver"],
-    smartScore: 89
+    smartScore: 91
   },
   {
     id: "p3",
-    name: "SonicMax Noise Cancelling Headphones",
-    description: "Immersive audio with industry-leading active noise cancellation.",
-    price: 15999,
+    name: "SonicPods Pro",
+    description: "Active noise cancelling wireless earbuds with spatial audio.",
+    price: 18999,
     discount: 15,
     category: "Electronics",
     image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop",
-    rating: 4.7,
-    reviews: 2150,
-    features: ["Active Noise Cancelling", "40 hours battery", "Hi-Res Audio", "Multipoint connection"],
+    images: [
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1526406915894-7bcd65f60845?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=800&auto=format&fit=crop"
+    ],
+    rating: 4.6,
+    reviews: 2100,
+    features: ["Active Noise Cancelling", "Transparency Mode", "Spatial Audio", "Sweat Resistant"],
     specs: {
-      Type: "Over-Ear",
-      Battery: "40h",
-      Connectivity: "Bluetooth 5.3",
-      Weight: "250g"
+      Battery: "Up to 6 hours",
+      Case: "MagSafe Charging",
+      Connectivity: "Bluetooth 5.3"
     },
-    stock: 100,
-    colors: ["Matte Black", "Midnight Blue"],
-    smartScore: 92
+    stock: 150,
+    colors: ["White"],
+    smartScore: 89
   },
   {
     id: "p4",
-    name: "Vortex Gaming Console",
+    name: "PlayStation 5 Console",
     description: "Next-gen gaming with 4K resolution and 120fps support.",
     price: 49999,
     discount: 0,
     category: "Gaming",
     image: "https://images.unsplash.com/photo-1605901309584-818e25960b8f?q=80&w=800&auto=format&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1605901309584-818e25960b8f?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1593118247619-e2d6f056869e?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1612287230202-1ff1d85d1bdf?q=80&w=800&auto=format&fit=crop"
+    ],
     rating: 4.9,
     reviews: 3400,
     features: ["4K Gaming", "1TB SSD", "Ray Tracing", "Dual Sense Controller"],
@@ -107,6 +111,11 @@ export const products: Product[] = [
     discount: 20,
     category: "Electronics",
     image: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=800&auto=format&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1526406915894-7bcd65f60845?q=80&w=800&auto=format&fit=crop"
+    ],
     rating: 4.4,
     reviews: 540,
     features: ["Heart Rate Monitor", "Built-in GPS", "SpO2 Tracking", "7-day battery"],
@@ -127,6 +136,11 @@ export const products: Product[] = [
     discount: 25,
     category: "Shoes",
     image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1608231387042-66d1773070a5?q=80&w=800&auto=format&fit=crop"
+    ],
     rating: 4.5,
     reviews: 120,
     features: ["Breathable mesh", "Cushioned sole", "Lightweight", "Durable grip"],
@@ -147,6 +161,11 @@ export const products: Product[] = [
     discount: 20,
     category: "Fashion",
     image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1593784991095-a205069470b6?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=800&auto=format&fit=crop"
+    ],
     rating: 4.3,
     reviews: 350,
     features: ["100% Cotton", "Breathable", "Pre-shrunk", "Machine washable"],
@@ -167,6 +186,11 @@ export const products: Product[] = [
     discount: 15,
     category: "Electronics",
     image: "https://images.unsplash.com/photo-1593784991095-a205069470b6?q=80&w=800&auto=format&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1593784991095-a205069470b6?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=800&auto=format&fit=crop"
+    ],
     rating: 4.6,
     reviews: 820,
     features: ["4K Resolution", "HDR 10", "Smart TV Apps", "Dolby Audio"],
@@ -187,6 +211,11 @@ export const products: Product[] = [
     discount: 5,
     category: "Grocery",
     image: "https://images.unsplash.com/photo-1560806887-1e4cd0b6fd6c?q=80&w=800&auto=format&fit=crop",
+    images: [
+      "https://images.unsplash.com/photo-1560806887-1e4cd0b6fd6c?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1583258292688-d0213dc5a3a8?q=80&w=800&auto=format&fit=crop"
+    ],
     rating: 4.8,
     reviews: 140,
     features: ["Organic", "Farm Fresh", "No Pesticides", "Sweet taste"],
@@ -201,9 +230,9 @@ export const products: Product[] = [
   }
 ];
 
-const categories = ["Mobiles", "Laptops", "Electronics", "Gaming", "Shoes", "Fashion", "Grocery", "Home Appliances"];
-const adjectives = ["Smart", "Ultra", "Pro", "Lite", "Max", "Eco", "Classic", "Vibrant", "Premium", "Essential"];
-const nouns = ["Device", "Gadget", "Gear", "Machine", "Accessory", "Item", "Tool", "Wear", "Bundle", "Kit"];
+const categories = ["Mobiles", "Laptops", "Electronics", "Gaming", "Shoes", "Fashion", "Grocery", "Home Appliances", "Software"];
+const adjectives = ["Smart", "Ultra", "Pro", "Lite", "Max", "Eco", "Classic", "Vibrant", "Premium", "Essential", "Cloud"];
+const nouns = ["Device", "Gadget", "Gear", "Machine", "Accessory", "Item", "Tool", "Wear", "Bundle", "Kit", "App", "Suite"];
 
 const categoryImages: Record<string, string[]> = {
   Mobiles: ["https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=800&auto=format&fit=crop", "https://images.unsplash.com/photo-1598327105666-5b89351cb31b?q=80&w=800&auto=format&fit=crop", "https://images.unsplash.com/photo-1585060544812-6b45742d762f?q=80&w=800&auto=format&fit=crop"],
@@ -213,22 +242,28 @@ const categoryImages: Record<string, string[]> = {
   Shoes: ["https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop", "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=800&auto=format&fit=crop", "https://images.unsplash.com/photo-1608231387042-66d1773070a5?q=80&w=800&auto=format&fit=crop"],
   Fashion: ["https://images.unsplash.com/photo-1593784991095-a205069470b6?q=80&w=800&auto=format&fit=crop", "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=800&auto=format&fit=crop", "https://images.unsplash.com/photo-1550639525-c97d455acf70?q=80&w=800&auto=format&fit=crop"],
   Grocery: ["https://images.unsplash.com/photo-1560806887-1e4cd0b6fd6c?q=80&w=800&auto=format&fit=crop", "https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=800&auto=format&fit=crop", "https://images.unsplash.com/photo-1583258292688-d0213dc5a3a8?q=80&w=800&auto=format&fit=crop"],
-  "Home Appliances": ["https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=800&auto=format&fit=crop", "https://images.unsplash.com/photo-1556910103-1c02745aae4d?q=80&w=800&auto=format&fit=crop", "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop"]
+  "Home Appliances": ["https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=800&auto=format&fit=crop", "https://images.unsplash.com/photo-1556910103-1c02745aae4d?q=80&w=800&auto=format&fit=crop", "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800&auto=format&fit=crop"],
+  Software: ["https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=800&auto=format&fit=crop", "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop", "https://images.unsplash.com/photo-1618401471353-b98afee0b2eb?q=80&w=800&auto=format&fit=crop"]
 };
 
-for (let i = 10; i <= 100; i++) {
+for (let i = 10; i <= 300; i++) {
   const category = categories[Math.floor(Math.random() * categories.length)];
   const price = Math.floor(Math.random() * 90000) + 999;
   const catImages = categoryImages[category] || categoryImages["Electronics"];
   const image = catImages[Math.floor(Math.random() * catImages.length)];
+  
+  // Shuffle catImages to provide a nice gallery
+  const shuffledImages = [...catImages].sort(() => 0.5 - Math.random());
+  
   products.push({
     id: `p${i}`,
     name: `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${category} ${nouns[Math.floor(Math.random() * nouns.length)]} ${i}`,
-    description: `A fantastic ${category.toLowerCase()} option for everyday use.`,
+    description: `A fantastic ${category.toLowerCase()} option for everyday use. Enjoy premium quality with vibrant details.`,
     price,
     discount: Math.floor(Math.random() * 30),
     category,
     image,
+    images: shuffledImages,
     rating: Number((Math.random() * 2 + 3).toFixed(1)),
     reviews: Math.floor(Math.random() * 5000),
     features: ["High Quality", "Durable", "Modern Design"],

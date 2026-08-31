@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Product } from '../types';
+import { playSound } from '../lib/sounds';
 
 interface CompareContextType {
   compareList: Product[];
@@ -13,6 +14,7 @@ export function CompareProvider({ children }: { children: ReactNode }) {
   const [compareList, setCompareList] = useState<Product[]>([]);
 
   const toggleCompare = (product: Product) => {
+    playSound('click');
     setCompareList(prev => {
       const exists = prev.find(p => p.id === product.id);
       if (exists) {

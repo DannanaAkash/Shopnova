@@ -89,8 +89,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           deliveryDate: order.deliveryDate || new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
           items: order.items
         };
-        const orderRef = await addDoc(collection(db, 'users', auth.currentUser.uid, 'orders'), orderData);
-        const newOrder = { ...order, id: orderRef.id };
+        const orderId = order.id || `ORD-${Math.floor(Math.random() * 1000000)}`;
+        await setDoc(doc(db, 'users', auth.currentUser.uid, 'orders', orderId), orderData);
+        
+        const newOrder = { ...order, id: orderId };
         setUser({ ...user, orders: [newOrder, ...user.orders] });
       } catch (err) {
         console.error("Failed to add order", err);
