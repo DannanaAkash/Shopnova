@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Sparkles, Mail, Lock, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword } from '../lib/firebase';
 import { motion } from 'motion/react';
 
 export default function Login() {
@@ -12,6 +11,7 @@ export default function Login() {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,11 +19,9 @@ export default function Login() {
     setIsSubmitting(true);
     
     try {
-      if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password);
-      } else {
-        await createUserWithEmailAndPassword(auth, email, password);
-      }
+      // Simulate network request
+      await new Promise(resolve => setTimeout(resolve, 800));
+      login(email);
       navigate('/profile');
     } catch (err: any) {
       setError(err.message || 'Authentication failed');
@@ -36,7 +34,8 @@ export default function Login() {
     setError('');
     setIsSubmitting(true);
     try {
-      await signInWithPopup(auth, googleProvider);
+      await new Promise(resolve => setTimeout(resolve, 800));
+      login('google-user@example.com');
       navigate('/profile');
     } catch (err: any) {
       setError(err.message || 'Google sign-in failed');
@@ -71,10 +70,10 @@ export default function Login() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900 tracking-tight">
+            <h2 className="mt-6 text-center text-3xl font-extrabold text-black tracking-tight">
               {isLogin ? 'Welcome back' : 'Create an account'}
             </h2>
-            <p className="mt-2 text-center text-sm text-slate-500 font-medium">
+            <p className="mt-2 text-center text-sm text-black font-medium">
               {isLogin ? 'Sign in to access your personalized experience.' : 'Join to discover curated premium products.'}
             </p>
           </motion.div>
@@ -94,7 +93,7 @@ export default function Login() {
             className="space-y-5"
           >
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Email address</label>
+              <label className="block text-sm font-bold text-black mb-2">Email address</label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Mail className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
@@ -104,14 +103,14 @@ export default function Login() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-11 pr-4 py-3.5 border border-slate-200 rounded-xl leading-5 bg-slate-50/50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all sm:text-sm font-medium"
+                  className="block w-full pl-11 pr-4 py-3.5 border border-slate-200 rounded-xl leading-5 bg-slate-50/50 text-black placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all sm:text-sm font-medium"
                   placeholder="name@example.com"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">Password</label>
+              <label className="block text-sm font-bold text-black mb-2">Password</label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
@@ -121,7 +120,7 @@ export default function Login() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-11 pr-4 py-3.5 border border-slate-200 rounded-xl leading-5 bg-slate-50/50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all sm:text-sm font-medium"
+                  className="block w-full pl-11 pr-4 py-3.5 border border-slate-200 rounded-xl leading-5 bg-slate-50/50 text-black placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all sm:text-sm font-medium"
                   placeholder="••••••••"
                 />
               </div>
@@ -142,7 +141,7 @@ export default function Login() {
                     type="checkbox"
                     className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
                   />
-                  <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-600 cursor-pointer font-medium">
+                  <label htmlFor="remember-me" className="ml-2 block text-sm text-black cursor-pointer font-medium">
                     Remember me
                   </label>
                 </div>
@@ -166,7 +165,7 @@ export default function Login() {
               type="button"
               onClick={handleGoogleSignIn}
               disabled={isSubmitting}
-              className="w-full flex justify-center items-center gap-2 py-3.5 px-4 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 bg-white hover:bg-slate-50 transition-all focus:outline-none focus:ring-4 focus:ring-slate-100 disabled:opacity-70"
+              className="w-full flex justify-center items-center gap-2 py-3.5 px-4 border border-slate-200 rounded-xl text-sm font-bold text-black bg-white hover:bg-slate-50 transition-all focus:outline-none focus:ring-4 focus:ring-slate-100 disabled:opacity-70"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -187,7 +186,7 @@ export default function Login() {
         >
           <button 
             onClick={() => setIsLogin(!isLogin)}
-            className="text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors"
+            className="text-sm font-bold text-black hover:text-indigo-600 transition-colors"
           >
             {isLogin ? (
               <>New here? <span className="text-indigo-600">Create an account</span></>

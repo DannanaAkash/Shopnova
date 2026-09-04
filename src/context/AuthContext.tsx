@@ -1,6 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User as AuthUser } from 'firebase/auth';
-import { auth, db, onAuthStateChanged, doc, getDoc, setDoc, collection, addDoc, getDocs } from '../lib/firebase';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Order } from '../types';
 
 interface UserProfile {
@@ -17,7 +15,7 @@ interface UserProfile {
 interface AuthContextType {
   user: UserProfile | null;
   loading: boolean;
-  login: (email: string) => void; // Keeping for backward compat, though handled in Login.tsx
+  login: (email: string) => void; 
   logout: () => Promise<void>;
   addOrder: (order: Order) => Promise<void>;
   updateProfilePhoto: (base64String: string) => Promise<void>;
@@ -28,102 +26,44 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        try {
-          const userDocRef = doc(db, 'users', firebaseUser.uid);
-          const userDoc = await getDoc(userDocRef);
-          
-          let userData: any = {
-            id: firebaseUser.uid,
-            name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
-            email: firebaseUser.email || '',
-            photoURL: firebaseUser.photoURL || '',
-            createdAt: Date.now()
-          };
-
-          if (userDoc.exists()) {
-            userData = { ...userData, ...userDoc.data() };
-          } else {
-            // Create new profile
-            await setDoc(userDocRef, userData);
-          }
-
-          // Fetch orders
-          const ordersRef = collection(db, 'users', firebaseUser.uid, 'orders');
-          const ordersSnap = await getDocs(ordersRef);
-          const orders = ordersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Order));
-          
-          setUser({ ...userData, orders });
-        } catch (error) {
-          console.error("Error fetching user profile:", error);
-          setUser(null);
-        }
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
+  const [loading, setLoading] = useState(false);
 
   const login = (email: string) => {
-    // Legacy mock function; actual login happens in Login.tsx via Firebase Auth
+    setUser({
+      id: 'local-user-123',
+      name: email.split('@')[0],
+      email: email,
+      photoURL: '',
+      createdAt: Date.now(),
+      orders: []
+    } as any);
   };
 
   const logout = async () => {
-    await auth.signOut();
+    setUser(null);
   };
 
   const addOrder = async (order: Order) => {
-    if (user && auth.currentUser) {
-      try {
-        const orderData = {
-          total: order.total,
-          status: order.status,
-          date: order.date,
-          deliveryDate: order.deliveryDate || new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-          items: order.items
-        };
-        const orderId = order.id || `ORD-${Math.floor(Math.random() * 1000000)}`;
-        await setDoc(doc(db, 'users', auth.currentUser.uid, 'orders', orderId), orderData);
-        
-        const newOrder = { ...order, id: orderId };
-        setUser({ ...user, orders: [newOrder, ...user.orders] });
-      } catch (err) {
-        console.error("Failed to add order", err);
-      }
+    if (user) {
+      const orderId = order.id || `ORD-${Math.floor(Math.random() * 1000000)}`;
+      const newOrder = { 
+        ...order, 
+        id: orderId,
+        deliveryDate: order.deliveryDate || new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString()
+      };
+      setUser({ ...user, orders: [newOrder, ...user.orders] });
     }
   };
 
   const updateProfilePhoto = async (base64String: string) => {
-    if (user && auth.currentUser) {
-      try {
-        const userDocRef = doc(db, 'users', auth.currentUser.uid);
-        await setDoc(userDocRef, { photoURL: base64String }, { merge: true });
-        setUser({ ...user, photoURL: base64String });
-      } catch (err) {
-        console.error("Failed to update photo", err);
-      }
+    if (user) {
+      setUser({ ...user, photoURL: base64String });
     }
   };
 
   const updateProfile = async (details: Partial<UserProfile>) => {
-    if (user && auth.currentUser) {
-      try {
-        const userDocRef = doc(db, 'users', auth.currentUser.uid);
-        // Exclude orders array from being written to user doc directly
-        const { orders, id, ...updateData } = details;
-        await setDoc(userDocRef, updateData, { merge: true });
-        setUser({ ...user, ...details });
-      } catch (err) {
-        console.error("Failed to update profile", err);
-        throw err;
-      }
+    if (user) {
+      setUser({ ...user, ...details });
     }
   };
 
@@ -141,3 +81,4 @@ export function useAuth() {
   }
   return context;
 }
+
