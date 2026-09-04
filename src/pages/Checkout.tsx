@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { ArrowRight, CreditCard, MapPin, CheckCircle2 } from 'lucide-react';
 import { formatCurrency } from '../lib/utils';
 import { playSound } from '../lib/sounds';
+import DeliveryMap from '../components/DeliveryMap';
 
 export default function Checkout() {
   const { cart, clearCart } = useCart();
@@ -26,8 +27,12 @@ export default function Checkout() {
 
   const handlePlaceOrder = async () => {
     setLoading(true);
+    setStep(3); // Go to processing step
     
     try {
+      // Simulate bank verification delay
+      await new Promise(resolve => setTimeout(resolve, 2500));
+      
       const estimatedDelivery = new Date();
       estimatedDelivery.setDate(estimatedDelivery.getDate() + 3);
       const deliveryIso = estimatedDelivery.toISOString();
@@ -49,17 +54,23 @@ export default function Checkout() {
       
       clearCart();
       setLoading(false);
-      setStep(3);
-      playSound('payment');
+      setStep(4);
+      playSound('success');
     } catch (err) {
       console.error("Failed to place order", err);
       setLoading(false);
+      setStep(2); // Go back to payment
       alert("Failed to place order. Please try again.");
     }
   };
 
-  if (cart.length === 0 && step !== 3) {
-    navigate('/');
+  useEffect(() => {
+    if (cart.length === 0 && step !== 3 && step !== 4) {
+      navigate('/');
+    }
+  }, [cart.length, step, navigate]);
+
+  if (cart.length === 0 && step !== 3 && step !== 4) {
     return null;
   }
 
@@ -186,12 +197,24 @@ export default function Checkout() {
         )}
 
         {step === 3 && (
+          <div className="text-center py-20 animate-in fade-in">
+            <div className="w-24 h-24 rounded-full border-4 border-indigo-100 dark:border-indigo-900 border-t-indigo-500 animate-spin mx-auto mb-6"></div>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Processing Payment...</h2>
+            <p className="text-slate-500 dark:text-slate-400">Please do not close this window or press back.</p>
+          </div>
+        )}
+
+        {step === 4 && (
           <div className="text-center py-10 animate-in zoom-in">
             <div className="w-24 h-24 bg-green-100 dark:bg-green-900/30 text-green-500 dark:text-green-400 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-green-50 dark:border-green-900/10">
               <CheckCircle2 className="w-12 h-12" />
             </div>
             <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white mb-4">Payment Successful!</h2>
             <p className="text-slate-500 dark:text-slate-400 mb-8 max-w-md mx-auto">Your order has been confirmed and is now being processed. You will receive an email confirmation shortly.</p>
+            
+            <div className="mb-8 w-full max-w-2xl mx-auto rounded-3xl overflow-hidden shadow-lg shadow-indigo-500/10 border border-slate-100 dark:border-slate-800">
+               <DeliveryMap />
+            </div>
             
             <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-3xl p-6 mb-8 text-indigo-800 dark:text-indigo-300 flex items-center justify-center gap-4 max-w-md mx-auto shadow-sm">
               <MapPin className="w-8 h-8 text-indigo-500" />
@@ -220,7 +243,7 @@ export default function Checkout() {
         )}
         </div>
         
-        {step !== 3 && (
+        {(step === 1 || step === 2) && (
           <div className="w-full lg:w-96 bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 h-fit">
             <h2 className="text-xl font-bold mb-4 dark:text-white">Order Summary</h2>
             <div className="space-y-4 mb-6">

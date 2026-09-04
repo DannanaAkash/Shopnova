@@ -66,11 +66,47 @@ export default function Profile() {
     const file = e.target.files?.[0];
     if (!file) return;
     setIsUploading(true);
+    
     const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64String = reader.result as string;
-      await updateProfilePhoto(base64String);
-      setIsUploading(false);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = async () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        
+        const MAX_WIDTH = 500;
+        const MAX_HEIGHT = 500;
+        
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+        
+        try {
+          await updateProfilePhoto(compressedBase64);
+        } catch (err) {
+          console.error("Error saving photo:", err);
+          alert("Failed to save photo. Please try a different image.");
+        } finally {
+          setIsUploading(false);
+        }
+      };
+      img.src = event.target?.result as string;
     };
     reader.readAsDataURL(file);
   };
@@ -188,7 +224,10 @@ export default function Profile() {
                   </h3>
                   {user.orders && user.orders.length > 0 ? (
                     <div className="space-y-4">
-                      {user.orders.map(order => (
+                      {user.orders.map(order => {
+                        const isCompleted = new Date(order.deliveryDate) < new Date();
+                        const displayStatus = isCompleted ? 'Completed' : order.status;
+                        return (
                         <details key={order.id} className="group bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden transition-all open:ring-2 open:ring-indigo-500/30">
                           <summary className="p-5 flex flex-col sm:flex-row justify-between sm:items-center gap-4 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer list-none">
                             <div className="flex items-center gap-4">
@@ -204,11 +243,11 @@ export default function Profile() {
                               <div className="flex flex-col sm:items-end gap-1">
                                 <div className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">₹{order.total.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</div>
                                 <div className={`text-xs font-bold px-2 py-1 rounded-full inline-block ${
-                                  order.status === 'Delivered' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
-                                  order.status === 'Processing' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
+                                  displayStatus === 'Completed' || displayStatus === 'Delivered' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
+                                  displayStatus === 'Processing' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
                                   'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
                                 }`}>
-                                  {order.status}
+                                  {displayStatus}
                                 </div>
                               </div>
                               <ChevronRight className="w-5 h-5 text-slate-400 group-open:rotate-90 transition-transform" />
@@ -263,7 +302,8 @@ export default function Profile() {
                             </button>
                           </div>
                         </details>
-                      ))}
+                      );
+                      })}
                     </div>
                   ) : (
                     <div className="text-slate-500 dark:text-slate-400 text-sm p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 text-center py-8">

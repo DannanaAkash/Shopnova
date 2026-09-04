@@ -122,6 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser({ ...user, ...details });
       } catch (err) {
         console.error("Failed to update profile", err);
+        throw err;
       }
     }
   };
